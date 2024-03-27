@@ -107,32 +107,6 @@ vector<string> getSuggestions(const string& word) {
         suggestions.push_back(word);
     }
 
-   /*
-    // Removing common suffixes and inflections
-    string transformedWords[] = {word};
-    if (word.size() > 3) {
-        if (word.substr(word.size() - 3) == "ing") {
-            transformedWords[1] = word.substr(0, word.size() - 3); // Remove -ing
-            transformedWords[2] = word.substr(0, word.size() - 3) + "e"; // Change -ing to -e
-        }
-        else if (word.substr(word.size() - 1) == "s") {
-            transformedWords[3] = word.substr(0, word.size() - 1); // Remove -s
-        }
-        else if (word.substr(word.size() - 2) == "es" || word.substr(word.size() - 2) == "ly" || word.substr(word.size() - 2) == "ed") {
-            transformedWords[4] = word.substr(0, word.size() - 2); // Remove -es, -ly, -ed
-        }
-        else if (word.substr(word.size() - 3) == "ies") {
-            transformedWords[5] = word.substr(0, word.size() - 3) + "y"; // Change -ies to -y
-        }
-    }
-  
-    // Generate suggestions for transformed words
-    for (const string& transformedWord : transformedWords) {
-        if (dictionary.search(transformedWord)) {
-            suggestions.push_back(transformedWord);
-        }
-    }
-        */
     // Generate suggestions by changing each character 
     for (int i = 0; i < word.length(); ++i) {
         for (char c = 'a'; c <= 'z'; c++) {
