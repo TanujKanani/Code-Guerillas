@@ -1,3 +1,4 @@
+			 //THIS CODE WORKS ON SOME INPUTS.STILL WORKING ON IT.
 #include <iostream>
 #include <fstream>
 #include <sstream>
