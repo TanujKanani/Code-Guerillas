@@ -1,3 +1,5 @@
+                    //THIS CODE HAS THE NECESSARY CHANGES FOR UPPER CASE LETTERS
+//ALSO,MAIN FUNCTION SHOULD BE CHANGED ACCORDING TO THESE FUNCTIONS.
 #include<iostream>
 #include<bits/stdc++.h>
 #include<fstream>
