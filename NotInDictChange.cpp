@@ -11,7 +11,7 @@ void correctedVectorString(vector<pair<string,int> >& prop)
         if(!dictionary.search(prop[i].first))
         {
             vector<string>* suggestions = getSuggestions(prop[i].first); // Dynamically allocate memory for suggestions
-            if(suggestions->empty()){
+            if(suggestions->empty()){    //changes for word not found in dictionary
                 cout<<"No suggestions found,the word "<< prop[i].first << " might be a name,so it stays as it is."<<endl;
                 continue;
             }
