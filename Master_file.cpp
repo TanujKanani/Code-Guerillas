@@ -139,17 +139,17 @@ string read_file(const string& filename)
     else return string("");
 }
 
-vector<pair<string,int> > split_words(string& data)
+vector<pair<string,bool> > split_words(string& data)
 {
-    vector<pair<string,int> > toBeChecked;
-    char* token, *delim = " .?!:;/\n\t,";
+    vector<pair<string,bool> > toBeChecked;
+    char* token, *delim = " .?!:;/\n\t\'\",";
     token = strtok(&data[0], delim);
     // Split the words
     while (token != nullptr)
     {   
-        int cflag = 0;
+        bool cflag = false;
         if(token[0]>='A' && token[0]<='Z'){
-            cflag =1;
+            cflag = true;
         }
             char word = token[0];
         // Convert each word ,from file to be corrected, to lower case
@@ -231,7 +231,7 @@ vector<string>* getSuggestions(const string& word)
     return suggestions;
 }
 
-void correctedVectorString(vector<pair<string,int> >& prop)
+void correctedVectorString(vector<pair<string,bool> >& prop)
 {
     for(int i = 0 ; i < prop.size() ; i++)
     {
@@ -239,20 +239,22 @@ void correctedVectorString(vector<pair<string,int> >& prop)
         {
             vector<string>* suggestions = getSuggestions(prop[i].first); // Dynamically allocate memory for suggestions
             if(suggestions->empty()){
-                cout<<"No suggestions found,the word "<< prop[i].first << " might be a name,so it stays as it is."<<endl;   //for some words that might not be in the dictionary.
+                cout<<"No suggestions found,the word "<< prop[i].first << " isn't in the dictionary,so it stays as it is."<<endl;   //for some words that might not be in the dictionary.
                 continue;                                                                                        
             }
             int choice = INT_MIN;
             cout << "Your choices for incorrect word : " << prop[i].first << " give index :" <<endl;
+            cout << "-1 Don't change.Keep as it is." << endl;
             for(int j = 0 ; j < suggestions->size() ; j++)
             {
                 cout << j << " " << (*suggestions)[j] << endl;
             }
             cin >> choice;
-
             // Update prop[i].first with the chosen suggestion
-            prop[i].first = (*suggestions)[choice];
-
+            if(choice != -1)
+            {
+                prop[i].first = (*suggestions)[choice];
+            }
             // Convert the first character to uppercase if necessary
             if(prop[i].second == 1){
                 prop[i].first[0] = toupper(prop[i].first[0]);
@@ -269,31 +271,31 @@ void correctedVectorString(vector<pair<string,int> >& prop)
         }
     }
 }
-void putDelim(vector<pair<string,int> >& prop)
+void putDelim(vector<pair<string,bool> >& prop)
 {
     ifstream read("Faulty.txt");
     ofstream write("newfile.txt");
     char ch;
     int count = 0;
-    int flag = 0;
+    bool flag = false;
     while(read.get(ch))
     {
         if(isalpha(ch)) // Check if character is alphabetic
         {
-            if(flag == 0)
+            if(flag == false)
             {
                 write << prop[count].first;
                 count++;
-                flag = 1;
+                flag = true;
             }
-            else if(flag == 1)
+            else if(flag == true)
                 continue;
         }
         else if(isblank(ch) || ispunct(ch) || isspace(ch)) // Check if character is a space, punctuation, or whitespace
         {
-            if(flag == 1)
+            if(flag == true)
             {
-                flag = 0;
+                flag = false;
                 write << ch;
             }
             else
@@ -309,7 +311,7 @@ int main()
 	buildDict();
 	string fileToBeChecked = "Faulty.txt";
     string intermediary = read_file(fileToBeChecked);
-    vector<pair<string,int> > tokenisedFile = split_words(intermediary);
+    vector<pair<string,bool> > tokenisedFile = split_words(intermediary);
     correctedVectorString(tokenisedFile);
     putDelim(tokenisedFile);
 	return 0;
