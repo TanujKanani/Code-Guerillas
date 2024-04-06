@@ -7,7 +7,7 @@ using namespace std;
 struct Node {
 	Node *links[26];
 	bool flag = false;
-	
+
     Node() 
     {
         for (int i = 0; i < 26; ++i)
@@ -125,7 +125,7 @@ void buildDict()
 string read_file(const string& filename)
 {
     ifstream read(filename);
-    
+
     if(!read.fail())
     {
         string data;
@@ -139,26 +139,21 @@ string read_file(const string& filename)
     else return string("");
 }
 
-vector<pair<string,bool> > split_words(string& data)
+vector<string> split_words(string& data)
 {
-    vector<pair<string,bool> > toBeChecked;
-    char* token, *delim = " .?!:;/\n\t\'\",";
+    vector<string> toBeChecked;
+    char* token, *delim = " .?!:;/\n\t,";
     token = strtok(&data[0], delim);
     // Split the words
     while (token != nullptr)
-    {   
-        bool cflag = false;
-        if(token[0]>='A' && token[0]<='Z'){
-            cflag = true;
-        }
-            char word = token[0];
+    {
         // Convert each word ,from file to be corrected, to lower case
         for (int i = 0; i < strlen(token); ++i)
         {
-            word = tolower(token[i]);
+            char word = tolower(token[i]);
             token[i] = word;
         }
-        toBeChecked.push_back(make_pair(string(token),cflag));
+        toBeChecked.push_back(token);
         token = strtok(nullptr, delim);
     }
     token = nullptr;
@@ -166,153 +161,111 @@ vector<pair<string,bool> > split_words(string& data)
     return toBeChecked;
 }
 
-vector<string>* getSuggestions(const string& word) 
+vector<string> getSuggestions(const string& word) 
 { 
-    vector<string>* suggestions = new vector<string>();
+    vector<string> suggestions;
 
     // Generate suggestions by changing each character 
      for (int i = 0; i < word.length(); ++i) 
     {
-        for (char c = 'a'; c <= 'z'; c++) 
-        { 
-            string modified = word; 
-            modified[i] = c;
+		for (char c = 'a'; c <= 'z'; c++) 
+		{ 
+		    string modified = word; 
+			modified[i] = c;
             if (dictionary.search(modified)) 
-            {
-                suggestions->push_back(modified); // Return immediately if suggestion found
-            } 
-        }
+			{
+				suggestions.push_back(modified); // Return immediately if suggestion found
+			} 
+		}
     }
 
-    // Generate suggestions by inserting each character 
-    for (int i = 0; i <= word.length(); ++i) 
-    {
-        for (char c = 'a'; c <= 'z'; c++) 
-        { 
-            string modified = word; 
-            modified.insert(i, 1, c);
-            if (dictionary.search(modified)) 
-            {
-                suggestions->push_back(modified); // Return immediately if suggestion found 
-            }
+// Generate suggestions by inserting each character 
+for (int i = 0; i <= word.length(); ++i) 
+{
+for (char c = 'a'; c <= 'z'; c++) 
+		{ 
+		    string modified = word; 
+			modified.insert(i, 1, c);
+			if (dictionary.search(modified)) 
+			{
+			suggestions.push_back(modified); // Return immediately if suggestion found 
+			}
         } 
-    }
-
-    // Generate suggestions by deleting each character 
-    for (int i = 0; i < word.length(); ++i) 
-    {
-        string modified = word; 
-        modified.erase(i, 1);
-        if(dictionary.search(modified)) 
-        {
-            suggestions->push_back(modified); // Return immediately if suggestion found 
-        }
-    }
-
-    // Generate suggestions by swapping adjacent characters
-    for (int i = 0; i < word.length()-1; i++) 
-    {
-        string modified = word;
-        swap(modified[i], modified[i + 1]); 
-        if(dictionary.search(modified)) 
-        {
-            suggestions->push_back(modified); // Return immediately if suggestion found 
-        }
-    }
-
-    // Words with prefixes as prop[i]
-    {
-        vector<string> prefix = dictionary.getWordsWithPrefix(word);
-        for(int p= 0; p < prefix.size() ; p++)
-        {
-            suggestions->push_back(prefix[p]);
-        }
-    }
-    return suggestions;
 }
 
-void correctedVectorString(vector<pair<string,bool> >& prop)
+        // Generate suggestions by deleting each character 
+        for (int i = 0; i < word.length(); ++i) 
+            {
+                string modified = word; 
+                modified.erase(i, 1);
+                if(dictionary.search(modified)) 
+                {
+                    suggestions.push_back(modified); // Return immediately if suggestion found 
+                }
+            }
+
+
+	// Generate suggestions by swapping adjacent characters
+	for (int i = 0; i < word.length()-1; i++) 
+	{
+	string modified = word;
+    swap(modified[i],modified[i + 1]); 
+	if(dictionary.search(modified)) 
+	{
+			suggestions.push_back(modified); // Return immediately if suggestion found 
+	}
+    }
+
+	//words with prefixes as prop[i]
+	{
+		vector<string> prefix = dictionary.getWordsWithPrefix(word);
+		for(int p= 0; p < prefix.size() ; p++)
+		{
+			suggestions.push_back(prefix[p]);
+		}
+	}
+	return suggestions;
+}
+
+void correctedVectorString(vector<string>& prop)
 {
     for(int i = 0 ; i < prop.size() ; i++)
     {
-        if(!dictionary.search(prop[i].first))
+        if(!dictionary.search(prop[i]))
         {
-            vector<string>* suggestions = getSuggestions(prop[i].first); // Dynamically allocate memory for suggestions
-            if(suggestions->empty()){
-                cout<<"No suggestions found,the word "<< prop[i].first << " isn't in the dictionary,so it stays as it is."<<endl;   //for some words that might not be in the dictionary.
-                continue;                                                                                        
-            }
-            int choice = INT_MIN;
-            cout << "Your choices for incorrect word : " << prop[i].first << " give index :" <<endl;
-            cout << "-1 Don't change.Keep as it is." << endl;
-            for(int j = 0 ; j < suggestions->size() ; j++)
+            vector<string> dummy = getSuggestions(prop[i]);
+            int choice = -1;
+            cout << "Your choices for incorrect word : " << prop[i] << " give index :" <<endl;
+            for(int j =0 ; j<dummy.size() ; j++)
             {
-                cout << j << " " << (*suggestions)[j] << endl;
+                cout << j << " " << dummy[j] << endl;
             }
             cin >> choice;
-            // Update prop[i].first with the chosen suggestion
-            if(choice != -1)
-            {
-                prop[i].first = (*suggestions)[choice];
-            }
-            // Convert the first character to uppercase if necessary
-            if(prop[i].second == 1){
-                prop[i].first[0] = toupper(prop[i].first[0]);
-            }
-
-            delete suggestions; // Free dynamically allocated memory
+            prop[i] = dummy[choice];
         }
-        else if(dictionary.search(prop[i].first))
-        {
-            // Convert the first character to uppercase if necessary
-            if(prop[i].second == 1){
-                prop[i].first[0] = toupper(prop[i].first[0]);
-            }
-        }
+        else if(dictionary.search(prop[i]))
+        continue;
     }
 }
-void putDelim(vector<pair<string,bool> >& prop)
+
+void newFile(vector<string>& prop)
 {
-    ifstream read("Faulty.txt");
-    ofstream write("newfile.txt");
-    char ch;
-    int count = 0;
-    bool flag = false;
-    while(read.get(ch))
+    ofstream output("newfile.txt");
+    if(!output.fail())
     {
-        if(isalpha(ch)) // Check if character is alphabetic
+        for(int i=0 ; i<prop.size() ; i++)
         {
-            if(flag == false)
-            {
-                write << prop[count].first;
-                count++;
-                flag = true;
-            }
-            else if(flag == true)
-                continue;
-        }
-        else if(isblank(ch) || ispunct(ch) || isspace(ch)) // Check if character is a space, punctuation, or whitespace
-        {
-            if(flag == true)
-            {
-                flag = false;
-                write << ch;
-            }
-            else
-                write << ch;
+            output << prop[i] << " ";
         }
     }
-    read.close();
-    write.close();
 }
-
 int main()
 {
 	buildDict();
 	string fileToBeChecked = "Faulty.txt";
     string intermediary = read_file(fileToBeChecked);
-    vector<pair<string,bool> > tokenisedFile = split_words(intermediary);
+    vector<string> tokenisedFile = split_words(intermediary);
     correctedVectorString(tokenisedFile);
-    putDelim(tokenisedFile);
+    newFile(tokenisedFile);
 	return 0;
 }
