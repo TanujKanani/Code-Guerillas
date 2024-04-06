@@ -324,8 +324,8 @@ void correctedVectorString(vector<pair<string,bool> >& prop)
 }
 void putDelim(vector<pair<string,bool> >& prop, const string& fname)
 {
-    fstream read(fname, ios::in);
-    fstream write(fname, ios::out);
+    ifstream read(fname);
+    ofstream write("newfile.txt");
     char ch;
     int count = 0;
     bool flag = false;
@@ -340,7 +340,7 @@ void putDelim(vector<pair<string,bool> >& prop, const string& fname)
                 flag = true;
             }
             else if(flag == true)
-                continue;
+            continue;
         }
         else if(isblank(ch) || ispunct(ch) || isspace(ch)) // Check if character is a space, punctuation, or whitespace
         {
