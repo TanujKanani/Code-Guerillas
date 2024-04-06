@@ -74,5 +74,22 @@ vector<string>* getSuggestions(const string& word)
             }
         }
     }
+
+     if(suggestions->empty()){        //THIS IS ADDED TO GET SUGGESTION FROM WAGNER FISCHER ONLY IF SUGGESTIONS ARE EMPTY.
+        const int max_dist = 2;
+        ifstream dictFile("dictionary.txt");
+        string dict_word;
+        while(getline(dictFile,dict_word)){
+            int dist = WF_dist(word,dict_word);
+            if(seenSuggestions.find(dict_word) == seenSuggestions.end()){
+                if(dist <= max_dist){
+                suggestions->push_back(dict_word);
+                seenSuggestions.insert(dict_word);
+                }
+            }   
+        }
+        dictFile.close();
+    }
+    
     return suggestions;
 }
