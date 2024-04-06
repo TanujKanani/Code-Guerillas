@@ -142,7 +142,7 @@ string read_file(const string& filename)
 vector<pair<string,bool> > split_words(string& data)
 {
     vector<pair<string,bool> > toBeChecked;
-    char* token, *delim = " .?!:;/\n\t\'\",";
+    char* token, *delim = " .?-!:;/\n\t\'\",";
     token = strtok(&data[0], delim);
     // Split the words on the basis of above delimeters
     while (token != nullptr)
